@@ -1,0 +1,40 @@
+FROM nvidia/cuda:8.0-cudnn7-devel-ubuntu16.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt update && apt install -y \
+    wget \
+    graphviz
+
+RUN wget https://repo.continuum.io/miniconda/Miniconda3-4.3.30-Linux-x86_64.sh -O miniconda.sh \
+    && bash miniconda.sh -bfp /opt/anaconda \
+    && rm miniconda.sh
+
+WORKDIR /code
+ENV PATH /opt/anaconda/bin:$PATH
+ENV PYTHONPATH /code:$PYTHONPATH
+
+RUN conda config --add channels conda-forge
+RUN conda config --add channels numba
+RUN conda install -y \
+    python=3.5 \
+    pandas \
+    jupyter \
+    notebook \
+    scipy \
+    scikit-learn \
+    matplotlib \
+    seaborn \
+    h5py \
+    hdf5 \
+    graphviz \
+    dask \
+    distributed \
+    tensorflow-gpu \
+    keras
+RUN conda install -y pytorch torchvision -c soumith
+
+RUN apt install p7zip-full
+
+EXPOSE 8888
+CMD jupyter notebook --ip 0.0.0.0 --port 8888 --allow-root

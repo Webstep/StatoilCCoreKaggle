@@ -1,0 +1,13 @@
+version: '2'
+
+services:
+
+  compute-box:
+    image: milesg/kaggle-icc:latest
+    build:
+      context: .
+      dockerfile: ./docker/milesg-Dockerfile
+    ports:
+      - 8888:8888
+    volumes:
+      - ./:/code
