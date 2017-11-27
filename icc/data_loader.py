@@ -33,8 +33,10 @@ class DataLoader:
         if not os.path.exists(path):
             # Hasn't been uncompressed..
             cpath = os.path.join(DATA_DIR, '{}.7z'.format(os.path.basename(path)))
+            if not os.path.exists(cpath):
+                raise FileNotFoundError('Compressed file not found at: {}'.format(cpath))
             warnings.warn('{} was not found, uncompressing file at: {}'.format(path, cpath))
-            process = Popen(['7z', 'e', cpath, '-o/code/data'])
+            process = Popen(['7z', 'e', cpath, '-o{}'.format(DATA_DIR)])
             stdout, stderr = process.communicate()
             warnings.warn('STDOUT: {}\nSTDERR: {}\n'.format(stdout, stderr))
             if not os.path.exists(path):
