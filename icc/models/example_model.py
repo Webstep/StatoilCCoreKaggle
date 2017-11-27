@@ -16,3 +16,6 @@ class DumbModel(BaseEstimator):
 
     def predict(self, X):
         return np.random.randint(self.min, self.max, X.shape[0])
+
+    def predict_proba(self, X):
+        return np.random.random_sample(X.shape[0])

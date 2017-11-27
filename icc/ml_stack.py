@@ -34,7 +34,6 @@ def run():
     for mod in os.listdir(os.path.join(os.path.dirname(__file__), 'models')):
         if mod == '__init__.py' or mod[-3:] != '.py':
             continue
-        print(mod)
         globals().update(importlib.import_module('icc.models.' + mod[:-3]).__dict__)
 
     # Debug, echo the registered models
