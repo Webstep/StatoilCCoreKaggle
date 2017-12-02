@@ -31,9 +31,9 @@ If files are compressed in .7z format, and system has 7z installed, it will auto
 
 ```python
 from icc.data_loader import DataLoader
-train = DataLoader.load_train()  # type: Dict
-test = DataLoader.load_test()    # type: Dict
-sample = DataLoader.load_sample_submission()  # type: pandas.core.DataFrame
+X, y = DataLoader.load_train()  # type: pd.DataFrame, pd.Series
+X = DataLoader.load_test()    # type: pd.DataFrame
+sample = DataLoader.load_sample_submission()  # type: pd.DataFrame
 ```
 
 ---
