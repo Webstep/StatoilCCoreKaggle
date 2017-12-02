@@ -4,6 +4,7 @@ import os
 import json
 import warnings
 import pandas as pd
+import numpy as np
 
 from subprocess import Popen, PIPE
 
@@ -51,7 +52,15 @@ class DataLoader:
         self._check_n_uncompress(path=path)
         with open(path, 'r') as f:
             data = json.load(f)
-        return data
+
+        # Convert to dataframe and convert images to numpy array types
+        data = pd.DataFrame(data)
+        data = data.replace(to_replace='na', value=np.NaN)
+        data['band_1'] = data['band_1'].map(np.array)
+        data['band_2'] = data['band_2'].map(np.array)
+
+        # If this is training set, return X, y otherwise just X
+        return data if 'is_iceberg' not in data.columns else (data[['band_1', 'band_2', 'inc_angle']], data['is_iceberg'])
 
     @classmethod
     def load_train(cls):

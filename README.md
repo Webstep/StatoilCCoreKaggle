@@ -6,7 +6,7 @@
 
 ---
 
-## Docker: (if desired)
+#### Docker: (if desired)
 Dockerfile(s) are found in `./docker`  
 Can be brought up with `docker-compose up`
 * Containers using nvidia-docker can be used with docker-compose by setting   
@@ -35,3 +35,20 @@ train = DataLoader.load_train()  # type: Dict
 test = DataLoader.load_test()    # type: Dict
 sample = DataLoader.load_sample_submission()  # type: pandas.core.DataFrame
 ```
+
+---
+
+#### Running ML Stack
+
+```python
+from icc.ml_stack import run_stack
+run_stack()
+```
+
+Or from the commandline:
+
+```commandline
+python icc/ml_stack.py
+```
+
+This outputs a `data/submission.csv` file ready for Kaggle.
