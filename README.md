@@ -36,7 +36,48 @@ X = DataLoader.load_test()    # type: pd.DataFrame
 sample = DataLoader.load_sample_submission()  # type: pd.DataFrame
 ```
 
+This data will be the EXACT same data used to pass to your model(s) within the StackedClassifier
+
 ---
+
+#### Include your model in the ML Stack:
+
+Reference `icc.models.example_model.py` for full example.
+
+Your model MUST inherit from `sklearn.base.BaseEstimator` and implement the following:
+- `fit(X, y)` -> fit your model and return `self`
+- `predict(X)` -> return 1d array of predicted classes
+- `predict_proba(X)` -> return array of shape [n_samples, 2] (probabilities of 0 and 1.. [[0.4, 0.6], ...])
+- `get_params(deep=True)` -> return dict of parameters specifies in your model's `__init__` 
+
+
+Example:
+```python 
+
+from icc.ml_stack import StackedClassifier
+
+
+@StackedClassifier.register
+class MySweetModel:
+
+    def __init__(self):
+        ...
+
+    def fit(self, X, y):
+        ...
+        
+    def predict(self, X):
+        ...
+        
+    def predict_proba(self, X):
+        ...
+        
+    def get_params(self, deep=True):
+        ...
+```
+
+---
+
 
 #### Running ML Stack
 
