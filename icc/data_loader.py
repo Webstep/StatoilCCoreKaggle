@@ -74,4 +74,4 @@ class DataLoader:
     def load_sample_submission(cls):
         cls()._check_n_uncompress(path=os.path.join(DATA_DIR, 'sample_submission.csv'))
         filename = os.path.join(DATA_DIR, 'sample_submission.csv')
-        return pd.read_csv(filename, compression='xz')
+        return pd.read_csv(filename)
