@@ -25,6 +25,25 @@ Can be brought up with `docker-compose up`
 
 ---
 
+#### Local environment:
+
+If you prefer not to use docker, there are two Anaconda environment files
+you can use to create the same conda environment used in the docker image:
+
+`conda-env-cpu.yml` & `conda-env-gpu.yml` for CPU and GPU environments, respectively.  
+
+Create an environment by:  
+```commandline
+conda env create --file conda-env-cpu.yml --name icc-cpu
+```
+
+Update an environment with: 
+```commandline
+conda env update --file conda-env-cpu.yml --name icc-cpu
+```
+
+---
+
 #### Data Loading:
 Assumes data has been loaded into `data` directory from the competition page. 
 If files are compressed in .7z format, and system has 7z installed, it will automatically be uncompressed.  
