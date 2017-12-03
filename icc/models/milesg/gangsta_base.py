@@ -45,12 +45,12 @@ class GangstaNetBase(nn.Module):
         input2 = self.pool(F.relu(self.input2_layer3_conv2d(input2)))
         input2 = F.relu(self.input2_layer4_fc(input2.view(-1, 3200)))
 
-        input3 = self.input3_layer1_fc1(input3)
+        input3 = F.relu(self.input3_layer1_fc1(input3))
 
         combined = torch.cat((input1, input2, input3), 1)
 
-        combined = (self.fc1(combined))
-        combined = (self.fc2(combined))
-        combined = F.sigmoid(self.fc3(combined))
+        combined = F.relu(self.fc1(combined))
+        combined = F.relu(self.fc2(combined))
+        combined = self.fc3(combined)
 
         return combined

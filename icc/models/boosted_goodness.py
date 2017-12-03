@@ -28,3 +28,6 @@ class BoostedGoodness(BoostedGoodnessBase, BaseEstimator):
         """Predict probability of X"""
         X = self._preprocess(X.copy())
         return self.model.predict_proba(X)
+
+    def get_params(self, deep=True):
+        return {}

@@ -9,6 +9,7 @@ import torch.optim as optim
 from torch.autograd import Variable
 
 from sklearn.base import BaseEstimator
+from sklearn.utils import shuffle
 
 from icc.models.milesg.gangsta_base import GangstaNetBase
 from icc.ml_stack import StackedClassifier
@@ -100,20 +101,23 @@ class GangstaNet(BaseEstimator):
         Handle the actual model training
         """
         optimizer = optim.Adam(self.net.parameters(), lr=0.001)
-        criterion = nn.BCELoss()
+        criterion = nn.BCEWithLogitsLoss()
         np.random.seed(0)
 
         for epoch in range(self.n_epoch):
-            for sample in (np.random.randint(0, X.shape[0], size=self.batch_size)
-                           for i in range(0, int(X.shape[0] / self.batch_size))):
-                band1 = np.concatenate(X.iloc[sample]['band_1'].values, axis=0).reshape(-1, 1, 75, 75, )
-                band2 = np.concatenate(X.iloc[sample]['band_2'].values, axis=0).reshape(-1, 1, 75, 75, )
-                angle = X.iloc[sample][['inc_angle', 'inc_angle_was_null']].values.reshape(-1, 2)
+
+            X, y = shuffle(X, y)
+
+            for batch_idx in range(0, X.shape[0] - self.batch_size, self.batch_size):
+
+                band1 = np.concatenate(X.iloc[batch_idx:batch_idx+self.batch_size]['band_1'].values, axis=0).reshape(-1, 1, 75, 75, )
+                band2 = np.concatenate(X.iloc[batch_idx:batch_idx+self.batch_size]['band_2'].values, axis=0).reshape(-1, 1, 75, 75, )
+                angle = X.iloc[batch_idx:batch_idx+self.batch_size][['inc_angle', 'inc_angle_was_null']].values.reshape(-1, 2)
 
                 band1 = Variable(torch.FloatTensor(band1).cuda())
                 band2 = Variable(torch.FloatTensor(band2).cuda())
                 angle = Variable(torch.FloatTensor(angle).cuda())
-                target = Variable(torch.FloatTensor(y.iloc[sample].values.astype(float).reshape(-1, 1)).cuda())
+                target = Variable(torch.FloatTensor(y.iloc[batch_idx:batch_idx+self.batch_size].values.astype(float).reshape(-1, 1)).cuda())
 
                 # batch step
                 optimizer.zero_grad()
