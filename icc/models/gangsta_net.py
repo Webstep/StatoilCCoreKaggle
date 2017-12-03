@@ -10,7 +10,7 @@ from torch.autograd import Variable
 
 from sklearn.base import BaseEstimator
 
-from icc.models.milesg.base import GangstaNetBase
+from icc.models.milesg.gangsta_base import GangstaNetBase
 from icc.ml_stack import StackedClassifier
 
 
