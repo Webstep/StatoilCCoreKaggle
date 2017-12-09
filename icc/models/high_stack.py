@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import click
+
 import pandas as pd
 import numpy as np
 
@@ -47,8 +47,7 @@ class HighStack(HighStackBase, BaseEstimator):
 
         # Process testing data if passed.
         if xTest is None:
-            click.secho('Testing data not passed to fit(), will not output testing loss during training.',
-                        color='yellow')
+            print('Testing data not passed to fit(), will not output testing loss during training.')
         else:
             xTest = self._preprocess(xTest)
             yTest = yTest if not hasattr(yTest, 'values') else yTest.values
@@ -80,8 +79,7 @@ class HighStack(HighStackBase, BaseEstimator):
         """
         Train model given processed X and y
         """
-        click.secho('{}: Good day, let\'s begin!'.format(self.__class__.__name__),
-                    color='green')
+        print('{}: Good day, let\'s begin!'.format(self.__class__.__name__))
         optimizer = optim.Adam(self.model.parameters(), lr=self.lr, weight_decay=self.weight_decay)
         criterion = nn.BCELoss()
 
@@ -121,9 +119,9 @@ class HighStack(HighStackBase, BaseEstimator):
             else:
                 _test_loss = None
 
-            click.secho('{name}: Epoch: {n_epoch}, Train loss: {train_loss:.4f} {test_loss}'
-                        .format(name=self.__class__.__name__,
-                                n_epoch=epoch + 1,
-                                train_loss=loss.data.cpu().numpy()[0],
-                                test_loss='- Test loss: {:.4f}'.format(_test_loss) if _test_loss is not None else '')
-                        )
+            print('{name}: Epoch: {n_epoch}, Train loss: {train_loss:.4f} {test_loss}'
+                  .format(name=self.__class__.__name__,
+                          n_epoch=epoch + 1,
+                          train_loss=loss.data.cpu().numpy()[0],
+                          test_loss='- Test loss: {:.4f}'.format(_test_loss) if _test_loss is not None else '')
+                  )
