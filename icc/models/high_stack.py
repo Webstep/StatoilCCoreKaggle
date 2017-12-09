@@ -19,7 +19,7 @@ from icc.ml_stack import StackedClassifier
 @StackedClassifier.register
 class HighStack(HighStackBase, BaseEstimator):
 
-    def __init__(self, n_epoch=35, batch_size=100, lr=0.001, weight_decay=0.0):
+    def __init__(self, n_epoch=15, batch_size=20, lr=0.0001, weight_decay=0.0):
         super().__init__(1)
 
         # Model and training params

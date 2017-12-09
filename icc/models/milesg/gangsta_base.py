@@ -51,6 +51,6 @@ class GangstaNetBase(nn.Module):
 
         combined = F.relu(self.fc1(combined))
         combined = F.relu(self.fc2(combined))
-        combined = self.fc3(combined)
+        combined = F.sigmoid(self.fc3(combined))
 
         return combined
