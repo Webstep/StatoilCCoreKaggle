@@ -111,4 +111,4 @@ data/
 !data/README.md
 
 # Tensorflow models and variables
-variables/
+saved_model/

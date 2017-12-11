@@ -24,7 +24,24 @@ def basic_vstack_band1_band2(X: pd.DataFrame):
 
     band1 = np.asarray(X["band_1"].tolist())
     band2 = np.asarray(X["band_2"].tolist())
-    return np.concatenate((band1, band2), axis=0) 
+    return np.concatenate((band1, band2), axis=0)
+
+
+def basic_hstack_band1_band2(X: pd.DataFrame):
+    """Horizontally stack columns band_1 and band_2.
+    We leave out 'Inc_angle' data.
+
+    Args:
+        X: must contain column names band_1 and band_2.
+    """
+    assert 'band_1' in X.columns
+    assert 'band_2' in X.columns
+
+    band1 = np.asarray(X["band_1"].tolist()).reshape(-1, 75, 75)
+    band2 = np.asarray(X["band_2"].tolist()).reshape(-1, 75 ,75)
+    band1 = band1[:,:,:,np.newaxis]
+    band2 = band2[:,:,:,np.newaxis]
+    return np.concatenate((band1, band2), axis=3)
 
 
 def reshape_grayscale_images(X: np.ndarray):
@@ -62,7 +79,7 @@ class Preprocess(object):
         # Randomize instances in set
         shuffle(X, y)
         
-        # Normalize images between 0 and 1. 
+        # Normalize images between 0 and 1.
         # Note: Use the same scaler on the testset.
         self.scaler_name = StandardScaler.__name__
         self.scaler = StandardScaler().fit(X)
@@ -97,4 +114,24 @@ class Preprocess(object):
     def _basic_testset(self, X: pd.DataFrame):
         """Preprocess data for testing."""
         X = basic_vstack_band1_band2(X)
-        return self.scaler.transform(X)
+        X_scaled = self.scaler.transform(X)
+        return reshape_grayscale_images(X_scaled)
+
+    def img_augmentation(self, X: pd.DataFrame):
+        # create 3 channel images
+        band1 = np.asarray(X["band_1"].tolist())
+        band2 = np.asarray(X["band_2"].tolist())
+
+        self.band1_scaler = StandardScaler().fit(band1)
+        band1 = self.band1_scaler.transform(band1)
+        self.band2_scaler = StandardScaler().fit(band2)
+        band2 = self.band2_scaler.transform(band2)
+
+        band1 = band1.reshape(-1, 75, 75)
+        band2 = band2.reshape(-1, 75, 75)
+        band3 = band1 / band2
+
+        band1 = band1[:,:,:,np.newaxis]
+        band2 = band2[:,:,:,np.newaxis]
+        band3 = band3[:,:,:,np.newaxis]
+        print(np.concatenate((band1, band2, band3), axis=3).shape)
