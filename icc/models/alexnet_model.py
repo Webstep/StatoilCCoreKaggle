@@ -47,7 +47,7 @@ class AlexNet(BaseEstimator):
 
 
     def predict(self, X: pd.DataFrame, thresh: float=0.5):
-        """TODO: Get binary prediction output.
+        """Get binary prediction output.
         """
         probs = self.predict_proba(X)
         return np.array([1 if p[1] > thresh else 0 for p in probs])
@@ -97,9 +97,9 @@ class AlexNet(BaseEstimator):
         Returns: self, a class object.
         """
         self.prep = Preprocess()
-        self.prep.img_augmentation(X)
-        #datasets = self.prep._basic_trainset(X, y)
-        #self._train(datasets)
+        #self.prep.img_augmentation(X)
+        datasets = self.prep._basic_trainset(X, y)
+        self._train(datasets)
         return self
 
 
