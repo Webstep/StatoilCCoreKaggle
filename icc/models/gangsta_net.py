@@ -23,7 +23,7 @@ class GangstaNet(BaseEstimator):
     Net based on separating the two input images and angle features into their own
     network branches and combines them later on.
     """
-    def __init__(self, n_epoch: int = 35, batch_size: int = 300):
+    def __init__(self, n_epoch: int = 12, batch_size: int = 20, lr=0.0001):
         super().__init__()
 
         self.net = GangstaNetBase()
@@ -32,6 +32,7 @@ class GangstaNet(BaseEstimator):
 
         self.n_epoch = n_epoch
         self.batch_size = batch_size
+        self.lr = lr
 
     def get_params(self, deep=True):
         return {'n_epoch': self.n_epoch, 'batch_size': self.batch_size}
@@ -100,8 +101,8 @@ class GangstaNet(BaseEstimator):
         """
         Handle the actual model training
         """
-        optimizer = optim.Adam(self.net.parameters(), lr=0.001)
-        criterion = nn.BCEWithLogitsLoss()
+        optimizer = optim.Adam(self.net.parameters(), lr=self.lr)
+        criterion = nn.BCELoss()
         np.random.seed(0)
 
         for epoch in range(self.n_epoch):
