@@ -38,12 +38,22 @@ class StackedClassifier(DataLoader):
         X, y = sc.load_train()
 
         # Define the StackingClassifier using all models registered.
-        clf = StackingClassifier(classifiers=[model() for model in sc._models if model.__name__ != 'DumbModel'],
+        classifiers = []
+        for model in sc._models:
+            if model.__name__ == 'DumbModel': continue
+            classifiers.extend([model(), model()])
+
+        clf = StackingClassifier(classifiers=classifiers,
                                  meta_classifier=LogisticRegression(),
                                  use_probas=True)
 
         # Train and output CV for each model individually, then the final StackingClassifier
         for model in [m() for m in sc._models if m.__name__ != 'DumbModel'] + [clf]:
+
+            # Only running StackingClassifier on CV Score
+            if model.__class__.__name__ != 'StackingClassifier':
+                continue
+
             print('\n---------Running: {}-----------'.format(model.__class__.__name__))
             scores = cross_val_score(model, X.copy(), y.copy(), scoring='neg_log_loss', cv=2)
 
