@@ -138,21 +138,23 @@ class AlexNetBase(object):
                     name = 'max_pool5',
                     )
 
-        def init_weights_and_biases(num_layers,layers_shape,
+
+        def init_weights_and_biases(num_layers, layers_shape,
                     init_w_op = tf.truncated_normal_initializer(stddev = 0.1),
                     init_b_op = tf.zeros_initializer()):
             """Helper function to create weights and biases."""
             param = {}
-            
             for i in range(num_layers):
                 param['W%s' % i] = tf.get_variable('W%s' % i, layers_shape[i][0], initializer = init_w_op)
                 param['b%s' % i] = tf.get_variable('b%s' % i, layers_shape[i][1], initializer = init_b_op)
             return param
 
+
         with tf.name_scope('fully_connected_network'):
             # We flatten the outputs after the max_pool5 operation from a 3-d matrix into 1-d because inputs 
             # into FC require a 1-d vector.
-            input_shape = 3*3*256
+            _, kernel_height, kernel_width, n_filters = max_pool5.get_shape().as_list()
+            input_shape = kernel_height * kernel_width * n_filters
             flat_inputs = tf.reshape(max_pool5, [-1, input_shape], name = 'flat_maxpool5_outputs')
 
             # Define the matrix shapes for the weights and biases of each layer. Each tuple represents a layer

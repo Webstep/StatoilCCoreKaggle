@@ -4,17 +4,18 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import pandas as pd
 import numpy as np
+import os
+import pandas as pd
 
 import tensorflow as tf
 
+from icc.models.spencer.alexnet.preprocessing import *
+from icc.models.spencer.alexnet.alexnet_base import AlexNetBase
+from icc.ml_stack import StackedClassifier
+
 from sklearn.base import BaseEstimator
 from sklearn.metrics import log_loss
-
-from icc.models.spencer.preprocessing import *
-from icc.models.spencer.alexnet.ver0.alexnet_base import AlexNetBase
-from icc.ml_stack import StackedClassifier
 
 
 @StackedClassifier.register
@@ -23,19 +24,32 @@ class AlexNet(BaseEstimator):
 
     Class inherits from sklearn's BaseEstimator class.
     """
-    def __init__(self, n_epochs: int=10, batch_size: int=128, save_path="."):
-        """
+    def __init__(self, n_epochs: int=10, 
+                batch_size: int=128, 
+                debug: bool=False, 
+                save_path: str="."
+                ):
+        """Alexnet constructor.
         Args:
-            n_epochs: number of iterations over train set
-            batch_size: size of train example chucks fed into network
-            save_path: path to save model, default is current dir
+            n_epochs: number of iterations over train set.
+            batch_size: size of train example chucks fed into network.
+            debug: if True, model variables and weights will not save.
+            save_path: path to save your model, default is current dir.
         """
         super().__init__()
 
         self.net = AlexNetBase()
         self.n_epochs = n_epochs
         self.batch_size = batch_size
-        self.save_path = save_path
+        self.debug = debug
+
+        if not debug:
+            if not os.path.exists(save_path):
+                os.mkdir(save_path)
+                print("=> save_path does not exist. Created new folder .. ")
+
+            self.save_path = save_path
+            print("=> Models will save to: {}".format(save_path))
 
 
     def get_params(self, deep: bool=True):
@@ -48,6 +62,12 @@ class AlexNet(BaseEstimator):
 
     def predict(self, X: pd.DataFrame, thresh: float=0.5):
         """Get binary prediction output.
+
+        Args:
+            X: data set.
+            thresh: set float to sort instances into classes, default 0.5.
+
+        Returns: np.ndarray, binary predictions for is_iceberg class.
         """
         probs = self.predict_proba(X)
         return np.array([1 if p[1] > thresh else 0 for p in probs])
@@ -94,10 +114,9 @@ class AlexNet(BaseEstimator):
             X: entire training set.
             y: ground truth of dataset.
 
-        Returns: self, a class object.
+        Returns: self, alexnet class object.
         """
         self.prep = Preprocess()
-        #self.prep.img_augmentation(X)
         datasets = self.prep._basic_trainset(X, y)
         self._train(datasets)
         return self
@@ -117,12 +136,13 @@ class AlexNet(BaseEstimator):
         ##
         # Basic training set up for computational graph.
         ##
+        tf.reset_default_graph()
 
         # Define nodes to feed data into graph.
-        self.X_batch = tf.placeholder(tf.float32, [None, 75, 75, 1])
+        self.X_batch = tf.placeholder(tf.float32, [None, 75, 75, 3])
         y_batch = tf.placeholder(tf.int32, [None])
 
-        # Convert labels to one-hot encoding. ie. [0] -> [1,0] and [1] -> [0, 1]
+        # Convert labels to one-hot encoding. ie. [0] -> [1,0] and [1] -> [0,1]
         y_one_hot = tf.one_hot(y_batch, depth=2, on_value=1, off_value=0, axis=-1)
 
         # Infer scores from the model.
@@ -145,7 +165,8 @@ class AlexNet(BaseEstimator):
         self.y_probs = tf.nn.softmax(logits)
 
         # Create an instance of the Saver class for saving the model and variables.
-        saver = tf.train.Saver(max_to_keep=1)
+        if not self.debug:
+            saver = tf.train.Saver(max_to_keep=1)
 
         ##
         # Start running computational graph from here.
@@ -165,7 +186,7 @@ class AlexNet(BaseEstimator):
             """Helper function to create minibatches."""
             start_idx = ix * batch_size
             end_idx = (ix * batch_size) + batch_size
-            return (X_train[start_idx:end_idx,:], y_train[start_idx:end_idx])
+            return (X[start_idx:end_idx, :], y[start_idx:end_idx])
 
 
         # Training over entire data "n_epochs" times.
@@ -183,21 +204,17 @@ class AlexNet(BaseEstimator):
                 tot_acc += acc
 
             train_loss = (tot_loss / n_batches)
-            train_acc = (tot_acc / n_batches) * 100
-            print("=>\t training:  acc {:0.2f}  cnn loss {:0.2f}".format(train_acc, train_loss))
+            train_acc = int(np.floor((tot_acc / n_batches) * 100))
+            print("=>\t training:    acc= {}%  loss= {:0.2f}".format(train_acc, train_loss))
 
             # Feed validation data as whole - only if CPU/GPU memory can handle it :)
             valid_loss, valid_acc, probs = self.sess.run([loss, accuracy, self.y_probs],
                                                 feed_dict={self.X_batch: X_val, y_batch: y_val})
-            print("=>\t validation:  acc {:0.2f}  cnn loss {:0.2f}".format(valid_acc * 100, valid_loss))
+            valid_acc = int(np.floor(valid_acc * 100))
+            print("=>\t validation:  acc= {}%  loss= {:0.2f}".format(valid_acc, valid_loss))
             self._LB_loss(y_val, probs)
 
         # Save final model
-        save_name = self.save_path+"loss{:0.2f}_epoch".format(valid_loss)
-        saver.save(self.sess, save_name, global_step=epoch)
-
-
-    def restore_model(self, load_path="."):
-        tf.reset_default_graph()
-        imported_meta = tf.train.import_meta_graph(load_path)
-
+        if not self.debug:
+            save_name = self.save_path+"loss{:0.2f}_epoch".format(valid_loss)
+            saver.save(self.sess, save_name, global_step=epoch)
