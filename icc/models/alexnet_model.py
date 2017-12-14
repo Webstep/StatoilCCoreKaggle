@@ -25,7 +25,9 @@ class AlexNet(BaseEstimator):
     Class inherits from sklearn's BaseEstimator class.
     """
     def __init__(self, n_epochs: int=10, 
-                batch_size: int=128, 
+                batch_size: int=128,
+                learning_rate: float=1e-4,
+                keep_prob: float=0.5,
                 debug: bool=False, 
                 save_path: str="."
                 ):
@@ -33,6 +35,8 @@ class AlexNet(BaseEstimator):
         Args:
             n_epochs: number of iterations over train set.
             batch_size: size of train example chucks fed into network.
+            keep_prob: prob of nodes to keep during training for fully-connected
+                    layers. If prob == 1.0, keep all nodes, o.w. default keep 0.5 (50% nodes) 
             debug: if True, model variables and weights will not save.
             save_path: path to save your model, default is current dir.
         """
@@ -41,6 +45,8 @@ class AlexNet(BaseEstimator):
         self.net = AlexNetBase()
         self.n_epochs = n_epochs
         self.batch_size = batch_size
+        self.learning_rate = learning_rate
+        self.keep_prob = keep_prob
         self.debug = debug
 
         if not debug:
@@ -146,7 +152,7 @@ class AlexNet(BaseEstimator):
         y_one_hot = tf.one_hot(y_batch, depth=2, on_value=1, off_value=0, axis=-1)
 
         # Infer scores from the model.
-        logits = self.net.inference(self.X_batch)
+        logits = self.net.inference(self.X_batch, keep_prob=self.keep_prob)
 
         # Accumulation of errors for one epoch.
         loss = self._loss(logits, y_one_hot)
@@ -159,7 +165,7 @@ class AlexNet(BaseEstimator):
         accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
         # Optimize model with Adam.
-        train_op = tf.train.AdamOptimizer(1e-4).minimize(loss)
+        train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(loss)
 
         # Attain probabilies for is_iceberg.
         self.y_probs = tf.nn.softmax(logits)

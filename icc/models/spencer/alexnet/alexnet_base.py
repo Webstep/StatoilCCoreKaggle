@@ -16,7 +16,7 @@ import tensorflow as tf
 class AlexNetBase(object):
     """Actual implementation of AlexNet model. """
 
-    def inference(self, minibatch_X, n_classes: int=2):
+    def inference(self, minibatch_X, n_classes: int=2, keep_prob: float=0.5):
         """Infer scores from AlexNet model.
 
         Args:
@@ -171,12 +171,14 @@ class AlexNetBase(object):
             with tf.name_scope('FC_layer_1'):
                 with tf.name_scope('relu_activations'):
                     fc6 = tf.nn.relu(tf.matmul(flat_inputs, param['W0']) + param['b0'])
+                    drpout6 = tf.nn.dropout(fc6, keep_prob, seed=1234)
 
             with tf.name_scope('FC_layer_2'):
                 with tf.name_scope('relu_activations'):
-                    fc7 = tf.nn.relu(tf.matmul(fc6, param['W1']) + param['b1'])
+                    fc7 = tf.nn.relu(tf.matmul(drpout6, param['W1']) + param['b1'])
+                    drpout7 = tf.nn.dropout(fc7, keep_prob, seed=1234)
 
             with tf.name_scope('FC_logits'):
-                logits = tf.nn.xw_plus_b(fc7, param['W2'], param['b2'], name = 'logits')
+                logits = tf.nn.xw_plus_b(drpout7, param['W2'], param['b2'], name = 'logits')
 
         return logits
