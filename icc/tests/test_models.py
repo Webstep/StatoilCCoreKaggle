@@ -7,6 +7,9 @@ import pytest
 
 @pytest.fixture
 def models():
+    """
+    PyTest fixture which returns a list of valid and registered models
+    """
     from icc.ml_stack import StackedClassifier
     for mod in os.listdir(os.path.join(os.path.dirname(__file__), '..', 'models')):
         if mod == '__init__.py' or mod[-3:] != '.py':
@@ -18,7 +21,7 @@ def models():
 @pytest.mark.parametrize('model', models(), ids=lambda model: 'model={}'.format(model.__name__))
 def test_model_has_proper_fit(model):
     """
-    Test that all registered models via StackedClassifier.register implement the correct features
+    Test that all registered models via StackedClassifier.register implement a valid "fit" method
     """
     import inspect
     model = model()
@@ -30,7 +33,7 @@ def test_model_has_proper_fit(model):
     # Validate model takes X and y args in fit method
     # Get fit signature, and verify first two args are X, y
     params = inspect.signature(model.fit).parameters  # parameters.keys() is OrderedDict
-    assert 'X' in list(params.keys())[0] and 'y' in list(params.keys())[1], \
+    assert 'X' == list(params.keys())[0] and 'y' == list(params.keys())[1], \
         'Model fit method signature should have "X, y" as first positional args'
 
     # Assert all other args are not required, optional args are ok.
@@ -41,12 +44,12 @@ def test_model_has_proper_fit(model):
 @pytest.mark.parametrize('model', models(), ids=lambda model: 'model={}'.format(model.__name__))
 def test_model_has_proper_predict_proba(model):
     """
-    Test that all registered models via StackedClassifier.register implement the correct features
+    Test that all registered models via StackedClassifier.register implement a valid "predict_proba" method
     """
     import inspect
     model = model()
 
-    # Validate model implements a predict methods
+    # Validate model implements a predict method
     assert hasattr(model, 'predict_proba'), \
         'Model should implement a "predict_proba" method'
     assert callable(model.predict_proba), \
