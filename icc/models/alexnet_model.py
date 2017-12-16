@@ -29,7 +29,8 @@ class AlexNet(BaseEstimator):
                 learning_rate: float=1e-4,
                 keep_prob: float=0.5,
                 debug: bool=False, 
-                save_path: str="."
+                save_path: str=".",
+                partition: int=3
                 ):
         """Alexnet constructor.
         Args:
@@ -39,6 +40,7 @@ class AlexNet(BaseEstimator):
                     layers. If prob == 1.0, keep all nodes, o.w. default keep 0.5 (50% nodes) 
             debug: if True, model variables and weights will not save.
             save_path: path to save your model, default is current dir.
+            partitions: set param to divide large testsets into parts when running predictions.
         """
         super().__init__()
 
@@ -48,6 +50,7 @@ class AlexNet(BaseEstimator):
         self.learning_rate = learning_rate
         self.keep_prob = keep_prob
         self.debug = debug
+        self.partition = partition
 
         if not debug:
             if not os.path.exists(save_path):
@@ -85,7 +88,32 @@ class AlexNet(BaseEstimator):
         Returns: probabilities computed using softmax.
         """
         X_scaled = self.prep._basic_testset(X)
-        return self.sess.run(self.y_probs, feed_dict={self.X_batch: X_scaled})
+        
+        try:
+            # Want to get predictions for a large dataset?
+            if X_scaled.shape[0] <= 4000:
+                # No -> my memory can handle up to 4000 samples.
+                probs = self.sess.run(self.y_probs, feed_dict={self.X_batch: X_scaled})
+            else:
+                # Yes -> divide data into partitions
+                if (X_scaled.shape[0] % self.partition) != 0:
+                    raise Exception
+                
+                n_samples = X_scaled.shape[0] // self.partition
+                probs = np.ndarray((X_scaled.shape[0], 2))
+                for i in range(self.partition):
+                    start_idx = i * n_samples
+                    end_idx = (i * n_samples) + n_samples
+                    probs[start_idx:end_idx,:] = (self.sess.run(self.y_probs, 
+                                                feed_dict={self.X_batch: X_scaled[start_idx: end_idx]}))
+            return probs
+
+        except MemoryError as e:
+            print(e)
+            print("Out of Memory error! Try increasing number of partitions to divide your dataset.")
+        except Exception as e:
+            print("{} samples is not divisible by {}. Chose a partition number that is divisible by {}"
+                .format(X_scaled.shape[0], self.partition, X_scaled.shape[0]))
 
 
     def _loss(self, logits, labels):
