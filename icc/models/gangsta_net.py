@@ -130,6 +130,3 @@ class GangstaNet(BaseEstimator):
                 optimizer.step()
 
             print('{}: Epoch: {} - Loss: {:.6f}'.format(self.__class__.__name__, epoch + 1, loss.data.cpu().numpy()[0]))
-
-
-
