@@ -20,4 +20,4 @@ jobs:
           name: Run Tests
           command: |
             set -x
-            docker-compose run compute-box pytest -v
+            docker-compose run -e PYTHONPATH=/opt/anaconda/envs/icc-cpu/bin:$PYTHONPATH:$PATH compute-box pytest -v

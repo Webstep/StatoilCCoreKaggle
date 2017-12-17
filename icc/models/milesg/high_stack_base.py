@@ -19,30 +19,41 @@ class ImageTransformer:
     ])
 
     @staticmethod
-    def normalize(pic):
+    def normalize(pic: np.ndarray) -> np.ndarray:
         return (pic - pic.min()) / (pic.max() - pic.min())
 
     @staticmethod
-    def log(pic):
+    def log(pic: np.ndarray) -> np.ndarray:
         return np.log(pic ** 2)
 
     @staticmethod
-    def square_root(pic):
+    def square_root(pic: np.ndarray) -> np.ndarray:
         return (pic ** 2) ** 0.25
 
     @staticmethod
-    def squared(pic):
+    def squared(pic: np.ndarray) -> np.ndarray:
         return pic ** 2
 
     @staticmethod
-    def smooth(pic):
+    def smooth(pic: np.ndarray) -> np.ndarray:
         return ndimage.gaussian_filter(pic, sigma=(1, 1), mode='wrap')
 
     @staticmethod
-    def cos(pic):
+    def cos(pic: np.ndarray) -> np.ndarray:
         return np.cos(pic)
 
-    def _transform(self, pic):
+    def _transform(self, pic: np.ndarray) -> np.ndarray:
+        """
+        Process the picture, expected to be of shape 75, 75
+
+        Parameters
+        ----------
+        pic - np.ndarray object representing either band1 or band2, already reshaped to size (75, 75)
+
+        Returns
+        -------
+        np.ndarray  - dstacked images on various transformations, in shape (-1 75, 75)
+        """
 
         layers = []
 
@@ -61,7 +72,19 @@ class ImageTransformer:
         return pic
 
     def _preprocess(self, X: pd.DataFrame, y: np.ndarray=None):
+        """
+        Preprocess X, independent of testing and training sets, unless y is passed, then assumed to be in 'fit' mode
+        in which case X and y will be augmented.
 
+        Parameters
+        ----------
+        X   - pd.DataFrame provided by one of DataLoader.load* methods
+        y   - (optional) pd.Series or np.array object containing target values
+
+        Returns
+        -------
+        (X, y)  - processed values of X and optionally, y
+        """
         imgs = np.array([
             np.dstack([
                 self._transform(img1.reshape(75, 75)),
