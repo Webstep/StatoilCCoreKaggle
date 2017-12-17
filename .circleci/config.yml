@@ -11,7 +11,7 @@ jobs:
       - checkout
 
       - run:
-          name: Build and Run Container
+          name: Pull Docker Image
           command: |
             set -x
             docker-compose pull
@@ -20,4 +20,4 @@ jobs:
           name: Run Tests
           command: |
             set -x
-            docker-compose run -e PYTHONPATH=/opt/anaconda/envs/icc-cpu/bin:$PYTHONPATH:$PATH compute-box pytest -v
+            docker-compose run -e PATH=/opt/anaconda/envs/icc-cpu/bin:$PYTHONPATH:$PATH compute-box pytest -v
