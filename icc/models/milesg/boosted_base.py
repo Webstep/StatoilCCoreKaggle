@@ -37,10 +37,18 @@ class BoostedGoodnessBase:
             ('xgboost', XGBClassifier(n_estimators=100))
         ])
 
-    def _preprocess(self, X: np.ndarray):
+    def _preprocess(self, X: pd.DataFrame) -> pd.DataFrame:
         """
         Preprocess X, alters in a way which does not affect training vs validation sets.
         preprocessing is unique to the image itself without regard between sets.
+
+        Parameters
+        ----------
+        X   - pd.DataFrame containing raw data supplied by DataLoader.load* methods
+
+        Returns
+        -------
+        Processed pandas.core.DataFrame
         """
         # Exploded embedded images so each pixel has its own column, after applying image specific transforms
         for band in ['band_1', 'band_2']:
@@ -55,17 +63,20 @@ class BoostedGoodnessBase:
         self.COLUMNS = X.columns
         return X
 
-    def band1(self, x):
+    def band1(self, x: np.ndarray) -> np.ndarray:
+        """Return columns which represent pixels to band1"""
         return x[:, [i for i in range(0, len(self.COLUMNS)) if self.COLUMNS[i].startswith('band_1')]]
 
-    def band2(self, x):
+    def band2(self, x: np.ndarray) -> np.ndarray:
+        """Return columns which represent pixels to band2"""
         return x[:, [i for i in range(0, len(self.COLUMNS)) if self.COLUMNS[i].startswith('band_2')]]
 
-    def angle(self, x):
+    def angle(self, x: np.ndarray) -> np.ndarray:
+        """Return column which represents angle"""
         return x[:, [i for i in range(0, len(self.COLUMNS)) if self.COLUMNS[i] in ['inc_angle', 'inc_angle_missing']]]
 
     @staticmethod
-    def norm_by_pic(pic: np.ndarray):
+    def norm_by_pic(pic: np.ndarray) -> np.ndarray:
         """
         Normalize the image based on it's own values
         """
@@ -73,10 +84,18 @@ class BoostedGoodnessBase:
         return pic
 
     @staticmethod
-    def transform(pic: np.ndarray):
+    def transform(pic: np.ndarray) -> np.ndarray:
         """
         Transform raw band img to centered, and gaussian filter transformation
         reshaped to 32x32 flattened
+
+        Parameters
+        ----------
+        pic - flattened image from original dataset, expected to be able to reshape to (75, 75)
+
+        Returns
+        -------
+        flattened version of image resized to (32, 32) dims
         """
         # Reshape and apply gaussian filter
         pic = pic.reshape(75, 75)

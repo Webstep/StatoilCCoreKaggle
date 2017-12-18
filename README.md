@@ -1,6 +1,9 @@
 ## Webstep Repository for Kaggle Competition:  
 ### [Statoil/C-CORE Iceberg Classifier Challenge](https://www.kaggle.com/c/statoil-iceberg-classifier-challenge)
 
+
+Build Status: 
+[![CircleCI](https://circleci.com/gh/milesgranger/StatoilCCoreKaggle/tree/master.svg?style=svg&circle-token=3fc7f5b381a1dd58d06545d0a1ccb71d96a96e3f)](https://circleci.com/gh/milesgranger/StatoilCCoreKaggle/tree/master)
 ---
 # Docs:
 

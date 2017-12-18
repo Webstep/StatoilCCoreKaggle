@@ -18,7 +18,7 @@ class StackedClassifier(DataLoader):
     _models = []
 
     @classmethod
-    def register(cls, model):
+    def register(cls, model: object) -> object:
         """
         Register the model
         """
@@ -26,7 +26,7 @@ class StackedClassifier(DataLoader):
         cls()._models.append(model)
         return model
 
-    def echo_registered_models(self):
+    def echo_registered_models(self) -> None:
         print('Running Stacking w/ Models: {}'.format([model for model in self._models if model.__name__ != 'DumbModel']))
 
     @classmethod
@@ -47,20 +47,12 @@ class StackedClassifier(DataLoader):
                                  meta_classifier=LogisticRegression(),
                                  use_probas=True)
 
-        # Train and output CV for each model individually, then the final StackingClassifier
-        for model in [m() for m in sc._models if m.__name__ != 'DumbModel'] + [clf]:
+        # Run cross-val to get an idea of what to expect for final output
+        scores = cross_val_score(clf, X.copy(), y.copy(), scoring='neg_log_loss', cv=2)
 
-            # Only running StackingClassifier on CV Score
-            if model.__class__.__name__ != 'StackingClassifier':
-                continue
-
-            print('\n---------Running: {}-----------'.format(model.__class__.__name__))
-            scores = cross_val_score(model, X.copy(), y.copy(), scoring='neg_log_loss', cv=2)
-
-            print('\n-----------\nCross validation (3) --> Model: {} - Avg Log Loss: {:.8f} - STD: {:.4f}\n------------'
-                  .format(model.__class__.__name__, scores.mean(), scores.std()))
-
-            # TODO: Add check to ensure each model is generalizable between a training and test set. Needed?
+        print('\n---------\nCross validation (3) --> StackingClassifier - Avg Log Loss: {:.8f} - STD: {:.4f}\n---------'
+              .format(scores.mean(), scores.std())
+              )
 
         # Finally, refit clf to entire dataset
         print('Fitting Stacking Classifier to entire training dataset...')
@@ -68,7 +60,7 @@ class StackedClassifier(DataLoader):
         return clf
 
 
-def run_stack():
+def run_stack() -> None:
     """
     Run the StackedClassifier and any registered Models
     """

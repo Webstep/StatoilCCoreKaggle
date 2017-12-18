@@ -35,7 +35,13 @@ RUN conda install -y \
 
 # Conda install on this version takes FOREVER to do first transfer to cuda
 RUN pip install http://download.pytorch.org/whl/cu80/torch-0.2.0.post3-cp35-cp35m-manylinux1_x86_64.whl
-RUN pip install torchvision mlxtend xgboost scikit-image
+RUN pip install torchvision mlxtend xgboost scikit-image pytest
+
+# Clone root env (setup for GPU) with same env but w/ CPU setup (as of now, just requires swapping Tensorflow installs)
+# this is the env used during CircleCI testing, if the name changes in this env, also update .circleci/config.yml
+RUN conda create --clone root --name icc-cpu \
+    && conda uninstall --name icc-cpu tensorflow-gpu -y \
+    && conda install --name icc-cpu tensorflow -y
 
 RUN apt install p7zip-full
 

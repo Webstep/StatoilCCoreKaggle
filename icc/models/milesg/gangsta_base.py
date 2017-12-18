@@ -3,11 +3,15 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.autograd import Variable
 
 
 class GangstaNetBase(nn.Module):
 
     def __init__(self):
+        """
+        Define MLP architecture.
+        """
         super(GangstaNetBase, self).__init__()
 
         torch.manual_seed(0)
@@ -34,7 +38,20 @@ class GangstaNetBase(nn.Module):
         self.fc2 = nn.Linear(in_features=512, out_features=512)
         self.fc3 = nn.Linear(in_features=512, out_features=1)
 
-    def forward(self, input1, input2, input3):
+    def forward(self, input1: Variable, input2: Variable, input3: Variable) -> Variable:
+        """
+        forward pass function of net.
+
+        Parameters
+        ----------
+        input1 - input array expected to be transformed band1 of type torch.autograd.Variable
+        input2 - input array expected to be transformed band2 of type torch.autograd.Variable
+        input3 - input array from preprocessed inc_angle, value and binary flag indicated missing val, type torch.autograd.Variable
+
+        Returns
+        -------
+        Predicted output of type torch.autograd.Variable
+        """
         input1 = self.pool(F.relu(self.input1_layer1_conv2d(input1)))
         input1 = self.pool(F.relu(self.input1_layer2_conv2d(input1)))
         input1 = self.pool(F.relu(self.input1_layer3_conv2d(input1)))
