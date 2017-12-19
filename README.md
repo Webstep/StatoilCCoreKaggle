@@ -16,14 +16,13 @@ We recommend using docker because we will kept our latest environments up-to-dat
 #### Option 1) Docker:
 Dockerfile(s) are found in `./docker`:
 
-    * CPU: milesg-cpu-Dockerfile
-    * GPU: milesg-Dockerfile
+    (CPU) milesg-cpu-Dockerfile
+    (GPU) milesg-Dockerfile
 
 If you are building the image for the first time, cd into the main directory of this repo and in your terminal execute either,
 
-    (CPU) `docker-compose --file docker-compose-cpu.yml up`
-
-    (GPU) `docker-compose up`
+    (CPU) docker-compose --file docker-compose-cpu.yml up
+    (GPU) docker-compose up
 
 
 Note: Containers using nvidia-docker can be used with docker-compose by setting   
