@@ -7,17 +7,22 @@ Build Status:
 
 ## Getting started
 
-This repository provides two solutions for setting up your environment: docker or local environment configuration.
+This repository provides two solutions for setting up your environment: 
+    1) docker or,
+    2) local environment configuration
 
 We recommend using docker because we will kept our latest environments up-to-date within the Dockerfiles.
 
 #### Option 1) Docker:
 Dockerfile(s) are found in `./docker`:
+
     * CPU: milesg-cpu-Dockerfile
     * GPU: milesg-Dockerfile
 
 If you are building the image for the first time, cd into the main directory of this repo and in your terminal execute either,
+
     (CPU) `docker-compose --file docker-compose-cpu.yml up`
+
     (GPU) `docker-compose up`
 
 
