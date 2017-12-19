@@ -16,14 +16,23 @@ We recommend using docker because we will kept our latest environments up-to-dat
 #### Option 1) Docker:
 Dockerfile(s) are found in `./docker`:
 
+```commandline
     (CPU) milesg-cpu-Dockerfile
+
     (GPU) milesg-Dockerfile
+```
 
 If you are building the image for the first time, cd into the main directory of this repo and in your terminal execute either,
 
-    (CPU) docker-compose --file docker-compose-cpu.yml up
-    (GPU) docker-compose up
+(CPU)
+```commandline
+docker-compose --file docker-compose-cpu.yml up
+```
 
+(GPU)
+```commandline
+docker-compose up
+```
 
 Note: Containers using nvidia-docker can be used with docker-compose by setting   
 /etc/docker/daemon.json to the following:  
@@ -40,9 +49,16 @@ Note: Containers using nvidia-docker can be used with docker-compose by setting
 ```
 
 The easiest way to launch our docker container is:
-(CPU) `docker run --rm -v $(pwd):/code -p 8888:8888 milesg/kaggle-icc-cpu jupyter notebook --allow-root --ip 0.0.0.0 --port 8888 --no-browser`
 
-(GPU) `docker run --runtime=nvidia --rm -v $(pwd):/code -p 8888:8888 milesg/kaggle-icc jupyter notebook --allow-root --ip 0.0.0.0 --port 8888 --no-browser`
+(CPU)
+```commandline
+docker run --rm -v $(pwd):/code -p 8888:8888 milesg/kaggle-icc-cpu jupyter notebook --allow-root --ip 0.0.0.0 --port 8888 --no-browser
+```
+
+(GPU)
+```commandline
+docker run --runtime=nvidia --rm -v $(pwd):/code -p 8888:8888 milesg/kaggle-icc jupyter notebook --allow-root --ip 0.0.0.0 --port 8888 --no-browser
+```
 
 
 #### Option 2) Local environment:
