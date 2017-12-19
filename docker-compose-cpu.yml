@@ -1,0 +1,13 @@
+version: '2'
+
+services:
+
+  compute-box-cpu:
+    image: milesg/kaggle-icc-cpu:latest
+    build:
+      context: .
+      dockerfile: ./docker/milesg-cpu-Dockerfile
+    ports:
+      - 8888:8888
+    volumes:
+      - ./:/code

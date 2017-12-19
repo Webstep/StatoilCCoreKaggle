@@ -4,15 +4,37 @@
 
 Build Status: 
 [![CircleCI](https://circleci.com/gh/milesgranger/StatoilCCoreKaggle/tree/master.svg?style=svg&circle-token=3fc7f5b381a1dd58d06545d0a1ccb71d96a96e3f)](https://circleci.com/gh/milesgranger/StatoilCCoreKaggle/tree/master)
----
-# Docs:
 
----
+## Getting started
 
-#### Docker: (if desired)
-Dockerfile(s) are found in `./docker`  
-Can be brought up with `docker-compose up`
-* Containers using nvidia-docker can be used with docker-compose by setting   
+This repository provides two solutions for setting up your environment: 
+    1) docker or,
+    2) local environment configuration
+
+We recommend using docker because we will kept our latest environments up-to-date within the Dockerfiles.
+
+#### Option 1) Docker:
+Dockerfile(s) are found in `./docker`:
+
+```commandline
+    (CPU) milesg-cpu-Dockerfile
+
+    (GPU) milesg-Dockerfile
+```
+
+If you are building the image for the first time, cd into the main directory of this repo and in your terminal execute either,
+
+(CPU)
+```commandline
+docker-compose --file docker-compose-cpu.yml up
+```
+
+(GPU)
+```commandline
+docker-compose up
+```
+
+Note: Containers using nvidia-docker can be used with docker-compose by setting   
 /etc/docker/daemon.json to the following:  
 ```json
 {
@@ -26,9 +48,20 @@ Can be brought up with `docker-compose up`
 }
 ```
 
----
+The easiest way to launch our docker container is:
 
-#### Local environment:
+(CPU)
+```commandline
+docker run --rm -v $(pwd):/code -p 8888:8888 milesg/kaggle-icc-cpu jupyter notebook --allow-root --ip 0.0.0.0 --port 8888 --no-browser
+```
+
+(GPU)
+```commandline
+docker run --runtime=nvidia --rm -v $(pwd):/code -p 8888:8888 milesg/kaggle-icc jupyter notebook --allow-root --ip 0.0.0.0 --port 8888 --no-browser
+```
+
+
+#### Option 2) Local environment:
 
 If you prefer not to use docker, there are two Anaconda environment files
 you can use to create the same conda environment used in the docker image:
