@@ -1,0 +1,4 @@
+FROM milesg/kaggle-icc:latest
+
+RUN conda uninstall tensorflow-gpu -y
+RUN conda install tensorflow -y
