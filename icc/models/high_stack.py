@@ -36,7 +36,7 @@ class HighStack(HighStackBase, BaseEstimator):
             'weight_decay': self.weight_decay
         }
 
-    def fit(self, X, y, xTest=None, yTest=None):
+    def fit(self, X: pd.DataFrame, y: np.ndarray, xTest=None, yTest=None):
         """
         Fit to X given y
         """

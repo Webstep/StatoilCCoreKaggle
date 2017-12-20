@@ -24,6 +24,8 @@ def test_model_has_proper_fit(model):
     Test that all registered models via StackedClassifier.register implement a valid "fit" method
     """
     import inspect
+    import pandas as pd
+    import numpy as np
     model = model()
 
     # Validate model implements a fit method
@@ -40,6 +42,14 @@ def test_model_has_proper_fit(model):
     assert all([params.get(param).default != inspect._empty for param in params.keys() if param not in ['X', 'y']]), \
         'All other args to "fit" should be optional aside from "X" and "y"\nfit parameters: {}'.format(params)
 
+    # Ensure X if of type pandas.core.DataFrame and y is either pd.Series or nd.ndarray
+    assert params.get('X').annotation == pd.DataFrame, \
+        'X should be type annotated to accept pandas DataFrame; currently it is: "{}" for model: {}' \
+        .format(params.get('X').annotation, model.__class__.__name__)
+    assert params.get('y').annotation in [np.ndarray, pd.Series], \
+        'y should be type annotated to accept pandas DataFrame or numpy ndarray; currently it is: "{}" for model: {}' \
+        .format(params.get('y').annotation, model.__class__.__name__)
+
 
 @pytest.mark.parametrize('model', models(), ids=lambda model: 'model={}'.format(model.__name__))
 def test_model_has_proper_predict_proba(model):
@@ -47,6 +57,7 @@ def test_model_has_proper_predict_proba(model):
     Test that all registered models via StackedClassifier.register implement a valid "predict_proba" method
     """
     import inspect
+    import pandas as pd
     model = model()
 
     # Validate model implements a predict method
@@ -58,13 +69,17 @@ def test_model_has_proper_predict_proba(model):
     # Validate model takes X and y args in fit method
     # Get fit signature, and verify first two args are X, y
     params = inspect.signature(model.predict_proba).parameters  # parameters.keys() is OrderedDict
-    assert 'X' in params, \
-        'Model "predict" method should take an "X" parameter'
+    assert 'X' in params, 'Model "predict" method should take an "X" parameter'
 
     # Assert all other args are not required, since predict_proba will only get passed X
     # ok, to have other optional args.
     assert all([params.get(param).default != inspect._empty for param in params.keys() if param != 'X']), \
-        'All other args to "predict" method should be optional aside from "X"\npredict_proba parameters: {}'.format(params)
+        'All other args to "predict" method should be optional aside from "X"\npredict_proba parameters: {} for model: {}' \
+        .format(params, model.__class__.__name__)
 
+    # Ensure X is annotated to pd.DataFrame
+    assert params.get('X').annotation == pd.DataFrame, \
+        'X should be type annotated to accept pandas DataFrame; currently it is: "{}" for model: {}' \
+        .format(params.get('X').annotation, model.__class__.__name__)
 
 
