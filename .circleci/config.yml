@@ -14,10 +14,10 @@ jobs:
           name: Pull Docker Image
           command: |
             set -x
-            docker-compose pull
+            docker-compose --file docker-compose-cpu.yml pull
 
       - run:
           name: Run Tests
           command: |
             set -x
-            docker-compose run -e PATH=/opt/anaconda/envs/icc-cpu/bin:$PYTHONPATH:$PATH compute-box pytest -v
+            docker-compose --file docker-compose-cpu.yml run compute-box-cpu pytest -v

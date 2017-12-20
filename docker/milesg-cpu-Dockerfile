@@ -1,4 +1,6 @@
 FROM milesg/kaggle-icc:latest
 
-RUN conda uninstall tensorflow-gpu -y
+RUN conda uninstall tensorflow-gpu libgpuarray -y
+RUN pip uninstall torch torchvision -y
+RUN conda install pytorch torchvision -c pytorch -y
 RUN conda install tensorflow -y
