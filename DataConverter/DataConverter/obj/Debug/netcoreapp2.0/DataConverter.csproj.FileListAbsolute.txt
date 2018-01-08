@@ -1,0 +1,11 @@
+C:\Drive\Projects\StatoilCCoreKaggle\DataConverter\DataConverter\bin\Debug\netcoreapp2.0\DataConverter.deps.json
+C:\Drive\Projects\StatoilCCoreKaggle\DataConverter\DataConverter\bin\Debug\netcoreapp2.0\DataConverter.runtimeconfig.json
+C:\Drive\Projects\StatoilCCoreKaggle\DataConverter\DataConverter\bin\Debug\netcoreapp2.0\DataConverter.runtimeconfig.dev.json
+C:\Drive\Projects\StatoilCCoreKaggle\DataConverter\DataConverter\bin\Debug\netcoreapp2.0\DataConverter.dll
+C:\Drive\Projects\StatoilCCoreKaggle\DataConverter\DataConverter\obj\Debug\netcoreapp2.0\DataConverter.csprojResolveAssemblyReference.cache
+C:\Drive\Projects\StatoilCCoreKaggle\DataConverter\DataConverter\obj\Debug\netcoreapp2.0\DataConverter.csproj.CoreCompileInputs.cache
+C:\Drive\Projects\StatoilCCoreKaggle\DataConverter\DataConverter\obj\Debug\netcoreapp2.0\DataConverter.AssemblyInfoInputs.cache
+C:\Drive\Projects\StatoilCCoreKaggle\DataConverter\DataConverter\obj\Debug\netcoreapp2.0\DataConverter.AssemblyInfo.cs
+C:\Drive\Projects\StatoilCCoreKaggle\DataConverter\DataConverter\bin\Debug\netcoreapp2.0\DataConverter.pdb
+C:\Drive\Projects\StatoilCCoreKaggle\DataConverter\DataConverter\obj\Debug\netcoreapp2.0\DataConverter.dll
+C:\Drive\Projects\StatoilCCoreKaggle\DataConverter\DataConverter\obj\Debug\netcoreapp2.0\DataConverter.pdb
