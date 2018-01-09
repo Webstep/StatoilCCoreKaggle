@@ -75,7 +75,6 @@ class Preprocess(object):
 
         band1 = np.asarray(X["band_1"].tolist()).reshape(-1, height, width)
         band2 = np.asarray(X["band_2"].tolist()).reshape(-1, height, width)
-        band3 = band1 / band2
         band3 = (band1 + band2) / 2
 
         band1 = band1[:,:,:,np.newaxis]
