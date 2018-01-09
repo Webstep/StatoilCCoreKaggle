@@ -16,7 +16,6 @@ from keras.layers import GlobalMaxPooling2D
 from keras.models import Model
 from keras.initializers import glorot_uniform
 from keras.utils import layer_utils
-from keras.utils import to_categorical
 from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint
 
@@ -24,8 +23,6 @@ from IPython.display import SVG
 from keras.utils.vis_utils import model_to_dot
 
 from icc.data_loader import DataLoader
-from icc.models.alexnet_model import AlexNet
-from icc.models.spencer.alexnet.preprocessing import *
 from icc.models.julian.julian_base_model_keras import JBaseKerasModel
 
 from icc.ml_stack import StackedClassifier

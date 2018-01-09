@@ -1,7 +1,9 @@
 
 import numpy as np
 from sklearn.base import BaseEstimator
-
+from icc.models.spencer.alexnet.preprocessing import *
+from keras.utils import to_categorical
+from keras.callbacks import ModelCheckpoint
 
 
 class JBaseKerasModel(BaseEstimator):
