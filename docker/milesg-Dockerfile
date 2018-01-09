@@ -31,11 +31,12 @@ RUN conda install -y \
     dask \
     distributed \
     tensorflow-gpu \
-    keras
+    keras \
 
 # Conda install on this version takes FOREVER to do first transfer to cuda
 RUN pip install http://download.pytorch.org/whl/cu80/torch-0.2.0.post3-cp35-cp35m-manylinux1_x86_64.whl
-RUN pip install torchvision mlxtend xgboost scikit-image pytest opencv-python imgaug
+RUN pip install torchvision mlxtend xgboost scikit-image pytest
+RUN pip install opencv-python imgaug
 
 RUN apt install p7zip-full
 
