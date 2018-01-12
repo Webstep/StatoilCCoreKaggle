@@ -3,12 +3,25 @@
 import os
 import importlib
 import pandas as pd
+import tensorflow as tf
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import cross_val_score
 from mlxtend.classifier import StackingClassifier
 
 from icc.data_loader import DataLoader
 from icc.utils import DATA_DIR
+
+# Create tensorflow config which allows growing memory
+TF_CONFIG = tf.ConfigProto()
+TF_CONFIG.gpu_options.per_process_gpu_memory_fraction = 0.25
+TF_CONFIG.gpu_options.allow_growth = True
+
+# For some reason, in the depths of AI and the wonders of why Shania Twain's hair is so red,
+# you MUST make a tensorflow session BEFORE assigning a session to Keras, or even importing it at all.
+TF_SESSION = tf.Session(config=TF_CONFIG)
+
+from keras import backend as K
+K.set_session(tf.Session(config=TF_CONFIG))
 
 
 class StackedClassifier(DataLoader):
