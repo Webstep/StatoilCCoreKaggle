@@ -1,6 +1,47 @@
-FROM milesg/kaggle-icc:latest
+FROM debian:stretch-slim
 
-RUN conda uninstall tensorflow-gpu libgpuarray -y
-RUN pip uninstall torch torchvision -y
-RUN conda install pytorch torchvision -c pytorch -y
-RUN conda install tensorflow -y
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt update && apt install -y \
+    wget \
+    graphviz \
+    bzip2
+
+RUN wget https://repo.continuum.io/miniconda/Miniconda3-4.3.30-Linux-x86_64.sh -O miniconda.sh \
+    && bash miniconda.sh -bfp /opt/anaconda \
+    && rm miniconda.sh
+
+WORKDIR /code
+ENV PATH /opt/anaconda/bin:$PATH
+ENV PYTHONPATH /code:$PYTHONPATH
+ENV LC_ALL C.UTF-8
+ENV LANG C.UTF-8
+
+RUN conda config --add channels conda-forge
+RUN conda config --add channels numba
+RUN conda install -y \
+    python=3.5 \
+    pandas \
+    jupyter \
+    notebook \
+    scipy \
+    scikit-learn \
+    matplotlib \
+    seaborn \
+    h5py \
+    hdf5 \
+    graphviz \
+    dask \
+    distributed \
+    tensorflow \
+    keras
+
+# Conda install on this version takes FOREVER to do first transfer to cuda
+RUN pip install http://download.pytorch.org/whl/cpu/torch-0.3.0.post4-cp35-cp35m-linux_x86_64.whl
+RUN apt install build-essential -y
+RUN pip install torchvision mlxtend xgboost scikit-image pytest opencv-python imgaug
+
+RUN apt install -y p7zip-full
+
+EXPOSE 8888
+CMD jupyter notebook --ip 0.0.0.0 --port 8888 --allow-root

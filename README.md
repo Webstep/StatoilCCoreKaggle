@@ -24,6 +24,13 @@ Dockerfile(s) are found in `./docker`:
 
 If you are building the image for the first time, cd into the main directory of this repo and in your terminal execute either,
 
+*NOTE:* The images are available on DockerHub, so you can run: 
+```commandline
+docker pull milesg/kaggle-icc:latest
+docker pull milesg/kaggle-icc-cpu:latest
+```
+...to avoid a long build process locally.
+
 (CPU)
 ```commandline
 docker-compose --file docker-compose-cpu.yml up
