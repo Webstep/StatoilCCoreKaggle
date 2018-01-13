@@ -14,7 +14,6 @@ use std::option::Option;
 
 
 #[py::modinit(models)]
-// Initialize the 'alterations' module of lumberjack
 fn init_mod(py: Python, m: &PyModule) -> PyResult<()> {
 
     #[pyfn(m, "logistic_regression")]

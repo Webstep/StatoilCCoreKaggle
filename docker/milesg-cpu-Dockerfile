@@ -43,5 +43,12 @@ RUN pip install torchvision mlxtend xgboost scikit-image pytest opencv-python im
 
 RUN apt install -y p7zip-full
 
+# Install Rust & configure
+RUN apt update -y && apt install -y curl
+RUN curl https://sh.rustup.rs -sSf -o rust.sh \
+    && bash rust.sh -y
+ENV PATH $PATH:/root/.cargo/bin
+RUN /root/.cargo/bin/rustup default nightly-2018-01-01
+
 EXPOSE 8888
 CMD jupyter notebook --ip 0.0.0.0 --port 8888 --allow-root

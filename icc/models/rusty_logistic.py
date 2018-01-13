@@ -8,6 +8,7 @@ from sklearn.base import BaseEstimator
 from sklearn.preprocessing import QuantileTransformer, Imputer
 from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
+from icc.ml_stack import StackedClassifier
 
 try:
     # Try to import the compiled rust extension, if not, try to build it.
@@ -27,6 +28,7 @@ except ImportError:
         raise OSError('Unable to build rust extension!')
 
 
+@StackedClassifier.register
 class RustyLogistic(BaseEstimator):
     """
     Concept model, to demonstrate ability to connect to rust-lang model.
