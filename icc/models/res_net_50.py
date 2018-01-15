@@ -18,6 +18,8 @@ from keras.initializers import glorot_uniform
 from keras.utils import layer_utils
 from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint
+from keras.callbacks import ModelCheckpoint
+from keras.callbacks import EarlyStopping
 
 from IPython.display import SVG
 from keras.utils.vis_utils import model_to_dot
@@ -26,16 +28,39 @@ from icc.data_loader import DataLoader
 from icc.models.julian.julian_base_model_keras import JBaseKerasModel
 
 from icc.ml_stack import StackedClassifier
+import os
 
 @StackedClassifier.register
 # ResNet50 residual network as used in coursera
-class JResNet50 (JBaseKerasModel):
+class ResNet50 (JBaseKerasModel):
+
+    def __init__(self, epochs = 100, batch_size = 24, weights_path = None):
+        super().__init__(epochs = epochs, batch_size = batch_size, weights_path = None) #"resnet50.h5")
+
+    def _path_to_weights(self):
+        """
+        Return path to weights relative to model file.
+        """
+        current = os.path.dirname(__file__)
+        return os.path.join(current, self.weights_path)
+
 
     def _get_loss_func(self):
-        return 'binary_crossentropy'
+        return 'categorical_crossentropy'
 
     def _get_optimizer(self):
-        return Adam(lr = 0.00001, epsilon = 1e-8)
+        return "adam" #Adam(lr = 0.001, epsilon = 1e-8)
+
+    def _get_callbacks(self):
+        callbacks = []
+        filepath = 'weights.EPOCH{epoch:02d}-VAL_LOSS{val_loss:.2f}.hdf5'
+        modelCheckpointCallback = ModelCheckpoint(filepath, monitor='val_acc', save_best_only=True, mode='auto', period=1)
+        callbacks.append(modelCheckpointCallback)
+        
+        earlyStoppingCallback = EarlyStopping(monitor='val_loss', min_delta=0, patience=5, verbose=0, mode='auto')
+        #callbacks.append(earlyStoppingCallback)
+
+        return callbacks
 
     def get_model(self, input_shape = (75, 75, 3), classes = 2):
         """
