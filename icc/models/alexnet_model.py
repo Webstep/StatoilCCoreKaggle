@@ -12,7 +12,7 @@ import tensorflow as tf
 
 from icc.models.spencer.alexnet.preprocessing import *
 from icc.models.spencer.alexnet.alexnet_base import AlexNetBase
-from icc.ml_stack import StackedClassifier
+from icc.ml_stack import StackedClassifier, TF_CONFIG
 
 from sklearn.base import BaseEstimator
 from sklearn.metrics import log_loss
@@ -207,7 +207,7 @@ class AlexNet(BaseEstimator):
         ##
 
         # Create a session for the graph.
-        self.sess = tf.Session()
+        self.sess = tf.Session(config=TF_CONFIG)
 
         # Initialize variables in graph.
         self.sess.run(tf.global_variables_initializer())

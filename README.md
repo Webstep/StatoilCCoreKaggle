@@ -24,6 +24,13 @@ Dockerfile(s) are found in `./docker`:
 
 If you are building the image for the first time, cd into the main directory of this repo and in your terminal execute either,
 
+*NOTE:* The images are available on DockerHub, so you can run: 
+```commandline
+docker pull milesg/kaggle-icc:latest
+docker pull milesg/kaggle-icc-cpu:latest
+```
+...to avoid a long build process locally.
+
 (CPU)
 ```commandline
 docker-compose --file docker-compose-cpu.yml up
@@ -104,6 +111,31 @@ Your model MUST inherit from `sklearn.base.BaseEstimator` and implement the foll
 - `predict(X)` -> return 1d array of predicted classes
 - `predict_proba(X)` -> return array of shape [n_samples, 2] (probabilities of 0 and 1.. [[0.4, 0.6], ...])
 - `get_params(deep=True)` -> return dict of parameters specifies in your model's `__init__` 
+
+## QUICK TIP:
+
+If you can't get Docker, or the environment to work you can develop your 
+model in your own environment; so long as the libs you're using are 
+the ones we're using and your model will run in the following code:
+
+```python
+from icc.models import YourSweetModel
+from icc.data_loader import DataLoader
+from sklearn.model_selection import cross_val_score
+
+# Load training data and do cross val scoring
+X, y = DataLoader.load_train()
+model = YourSweetModel()  # Your model should take no args
+cross_val_score(model, X, y, scoring='neg_log_loss')
+
+# Fit and predict on actual test data
+model.fit(X, y)
+xTest = DataLoader.load_test()
+model.predict(xTest)
+```
+
+If your model makes it through this gaunlat, then it has a VERY good chance 
+of working in the overall model! Submit a Pull Request today! :)
 
 
 Example:
