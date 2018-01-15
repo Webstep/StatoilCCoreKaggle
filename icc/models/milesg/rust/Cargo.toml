@@ -1,0 +1,12 @@
+[package]
+name = "rust-model"
+version = "0.1.0"
+authors = ["Miles Granger <miles59923@gmail.com>"]
+
+[lib]
+name = "rustmodel"
+crate-type = ["cdylib"]
+
+[dependencies]
+rusty-machine="0.5.4"
+pyo3 = {version="0.2", features=["extension-module"]}
