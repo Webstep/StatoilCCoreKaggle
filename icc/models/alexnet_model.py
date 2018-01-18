@@ -10,7 +10,7 @@ import pandas as pd
 
 import tensorflow as tf
 
-from icc.models.spencer.alexnet.preprocessing import *
+from icc.contrib.preprocessing.utils import *
 from icc.models.spencer.alexnet.alexnet_base import AlexNetBase
 from icc.ml_stack import StackedClassifier
 
@@ -30,6 +30,7 @@ class AlexNet(BaseEstimator):
                 keep_prob: float=0.5,
                 debug: bool=False, 
                 save_path: str=".",
+                save_model: bool=False,
                 partition: int=3
                 ):
         """Alexnet constructor.
@@ -51,14 +52,16 @@ class AlexNet(BaseEstimator):
         self.keep_prob = keep_prob
         self.debug = debug
         self.partition = partition
+        self.save_model = save_model
 
         if not debug:
-            if not os.path.exists(save_path):
-                os.mkdir(save_path)
-                print("=> save_path does not exist. Created new folder .. ")
+            if save_model:
+                if not os.path.exists(save_path):
+                    os.mkdir(save_path)
+                    print("=> save_path does not exist. Created new folder .. ")
 
-            self.save_path = save_path
-            print("=> Models will save to: {}".format(save_path))
+                self.save_path = save_path
+                print("=> Models will save to: {}".format(save_path))
 
 
     def get_params(self, deep: bool=True):
@@ -249,6 +252,6 @@ class AlexNet(BaseEstimator):
             self._LB_loss(y_val, probs)
 
         # Save final model
-        if not self.debug:
-            save_name = self.save_path+"loss{:0.2f}_epoch".format(valid_loss)
+        if self.save_model:
+            save_name = self.save_path+"/loss{:0.2f}_epoch".format(valid_loss)
             saver.save(self.sess, save_name, global_step=epoch)

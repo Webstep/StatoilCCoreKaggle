@@ -5,10 +5,32 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
+import os
 import pandas as pd
+import pickle
+import sys
 
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
+
+
+def batch_generator(data, batch_size: int=500):
+    """Helper function to generate batches"""
+    batches = int(np.ceil(data.shape[0] / batch_size))
+    for i in range(batches):
+        start_ix = i * batch_size
+        end_ix = (i* batch_size) + batch_size
+        yield data[start_ix:end_ix]
+
+
+def load_from_pickle(filename):
+    with open(filename, 'rb') as fp:
+        return pickle.load(fp)
+
+
+def save_to_pickle(data, filename):
+    with open(filename, 'wb') as fp:
+        pickle.dump(data, fp, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 class Preprocess(object):
@@ -17,10 +39,10 @@ class Preprocess(object):
     def __init__(self):
         self.scaler = None
 
-    def _basic_trainset(self, X: pd.DataFrame, y: pd.Series, test_size: float=0.15):
+    def _basic_trainset(self, X: pd.DataFrame, y: pd.Series, test_size: float=0.15, how: str='deep', verbose=True):
         """Preprocess data for training."""
-        X = self.basic_dstack(X)
-        y = np.asarray(y.tolist())
+        X = self._stack(X, how=how)
+        y = self._labels(y, how)
 
         # Randomize instances in set
         shuffle(X, y)
@@ -32,36 +54,38 @@ class Preprocess(object):
         # Splitting X into training and validation sets.
         X_train, X_val, y_train, y_val = train_test_split(X_scaled, y, test_size=test_size, random_state=0)
 
-        print("=> Train images shape: {}".format(X_train.shape))
-        print("=> Train labels shape: {}\n".format(y_train.shape))
-        print("=> Validation images shape: {}".format(X_val.shape))
-        print("=> Validation labels shape: {}".format(y_val.shape))
-        print("")
-        print("=> Train ratio of icebergs-to-ships is {}:{}".format(len(y_train[y_train == 1]),
-                                                   len(y_train[y_train == 0])))
-        print("=> Validation ratio of icebergs-to-ships is {}:{}\n".format(len(y_val[y_val == 1]),
-                                                   len(y_val[y_val == 0])))
+        if verbose:
+            print("=> Train images shape: {}".format(X_train.shape))
+            print("=> Train labels shape: {}\n".format(y_train.shape))
+            print("=> Validation images shape: {}".format(X_val.shape))
+            print("=> Validation labels shape: {}".format(y_val.shape))
+            print("")
+            print("=> Train ratio of icebergs-to-ships is {}:{}".format(len(y_train[y_train == 1]),
+                                                       len(y_train[y_train == 0])))
+            print("=> Validation ratio of icebergs-to-ships is {}:{}\n".format(len(y_val[y_val == 1]),
+                                                       len(y_val[y_val == 0])))
 
         return [X_train, X_val, y_train, y_val]
 
 
-    def _basic_testset(self, X: pd.DataFrame):
-        """Preprocess testset.
+    def _basic_testset(self, X: pd.DataFrame, how: str='deep'):
+        """Preprocess testset. BUG!
 
         Args:
             X: test set.
 
         Returns: Rescaled set using training scaling params.
         """
-        X = self.basic_dstack(X)
+        X = self._stack(X, how)
         return self.scaler.transform(X)
 
 
-    def basic_dstack(self, X: pd.DataFrame):
+    def _stack(self, X: pd.DataFrame, how):
         """Creates a deep stack of 3 layers to form RGB-like images.
 
         Args:
             X: must contain column names band_1 and band_2.
+            how: specify 'deep' (creates RGB-like images) or 'vertical' stack (grayscale images)
 
         Returns: np.array, shape=(n_samples, height, width, channels)
         """
@@ -81,7 +105,17 @@ class Preprocess(object):
         band2 = band2[:,:,:,np.newaxis]
         band3 = band3[:,:,:,np.newaxis]
 
-        return np.concatenate((band1, band2, band3), axis=n_channels)
+        if how == 'deep':
+            return np.concatenate((band1, band2, band3), axis=n_channels)
+        elif how == 'vertical':
+            return np.concatenate((band1, band2, band3), axis=0)
+
+
+    def _labels(self, y: pd.Series, how):
+        if how == 'deep':
+            return np.asarray(y.tolist())
+        elif how == 'vertical':
+            return np.asarray(y.tolist() * 3)
 
 
 class FeatureScaling(object):
