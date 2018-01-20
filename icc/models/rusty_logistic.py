@@ -97,4 +97,4 @@ class RustyLogistic(BaseEstimator):
         X = self._format_x(X.copy())
         X = self.pipeline.transform(X)
         output = models.logistic_regression(X, self.xTrain, self.yTrain.values)
-        return np.array(output)
+        return np.array([[1-p, p] for p in output])

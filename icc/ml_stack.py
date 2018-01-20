@@ -3,6 +3,7 @@
 import os
 import importlib
 import pandas as pd
+import keras
 import tensorflow as tf
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import cross_val_score
@@ -16,12 +17,14 @@ TF_CONFIG = tf.ConfigProto()
 TF_CONFIG.gpu_options.per_process_gpu_memory_fraction = 0.25
 TF_CONFIG.gpu_options.allow_growth = True
 
-# For some reason, in the depths of AI and the wonders of why Shania Twain's hair is so red,
+# For some reason, in the depths of AI and the wonders of why Reba McEntire's hair is so red,
 # you MUST make a tensorflow session BEFORE assigning a session to Keras, or even importing it at all.
 TF_SESSION = tf.Session(config=TF_CONFIG)
 
-from keras import backend as K
-K.set_session(tf.Session(config=TF_CONFIG))
+# Set Keras tensorflow session if the backend is Tensorflow, which is it's default
+if os.environ.get('KERAS_BACKEND', 'tensorflow') == 'tensorflow':
+    from keras import backend as K
+    K.set_session(tf.Session(config=TF_CONFIG))
 
 
 class StackedClassifier(DataLoader):
@@ -51,21 +54,21 @@ class StackedClassifier(DataLoader):
         X, y = sc.load_train()
 
         # Define the StackingClassifier using all models registered.
-        classifiers = []
-        for model in sc._models:
-            if model.__name__ == 'DumbModel': continue
-            classifiers.extend([model(), model()])
+        classifiers = [Model() for Model in sc._models if Model.__name__ != 'DumbModel']
 
         clf = StackingClassifier(classifiers=classifiers,
                                  meta_classifier=LogisticRegression(),
-                                 use_probas=True)
+                                 verbose=1,
+                                 average_probas=False,
+                                 use_probas=True
+                                 )
 
         # Run cross-val to get an idea of what to expect for final output
-        scores = cross_val_score(clf, X.copy(), y.copy(), scoring='neg_log_loss', cv=2)
+        #scores = cross_val_score(clf, X.copy(), y.copy(), scoring='neg_log_loss', cv=2)
 
-        print('\n---------\nCross validation (3) --> StackingClassifier - Avg Log Loss: {:.8f} - STD: {:.4f}\n---------'
-              .format(scores.mean(), scores.std())
-              )
+        #print('\n---------\nCross validation (3) --> StackingClassifier - Avg Log Loss: {:.8f} - STD: {:.4f}\n---------'
+        #      .format(scores.mean(), scores.std())
+        #      )
 
         # Finally, refit clf to entire dataset
         print('Fitting Stacking Classifier to entire training dataset...')

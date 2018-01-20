@@ -34,7 +34,7 @@ import os
 # ResNet50 residual network as used in coursera
 class ResNet50 (JBaseKerasModel):
 
-    def __init__(self, epochs = 100, batch_size = 24, weights_path = None):
+    def __init__(self, epochs = 50, batch_size = 24, weights_path = None):
         super().__init__(epochs = epochs, batch_size = batch_size, weights_path = None) #"resnet50.h5")
 
     def _path_to_weights(self):
@@ -87,7 +87,7 @@ class ResNet50 (JBaseKerasModel):
                    (7, 7), 
                    strides = (2, 2), 
                    name = 'conv1', 
-                   kernel_initializer = glorot_uniform(seed=0))(X)
+                   kernel_initializer = glorot_uniform(seed=123))(X)
         X = BatchNormalization(axis = 3, name = 'bn_conv1')(X)
         X = Activation('relu')(X)
         X = MaxPooling2D((3, 3), strides=(2, 2))(X)
@@ -145,7 +145,7 @@ class ResNet50 (JBaseKerasModel):
         X = Dense(  classes, 
                     activation='softmax', 
                     name='FC' + str(classes), 
-                    kernel_initializer = glorot_uniform(seed=0))(X)
+                    kernel_initializer = glorot_uniform(seed=123))(X)
         
         
         # Create model
@@ -187,7 +187,7 @@ class ResNet50 (JBaseKerasModel):
                    strides = (1,1), 
                    padding = 'valid', 
                    name = conv_name_base + '2a', 
-                   kernel_initializer = glorot_uniform(seed=0))(X)
+                   kernel_initializer = glorot_uniform(seed=123))(X)
         X = BatchNormalization(axis = 3, 
                                name = bn_name_base + '2a')(X)
         X = Activation('relu')(X)
@@ -198,7 +198,7 @@ class ResNet50 (JBaseKerasModel):
                   strides = (1, 1),
                   padding = 'same',
                   name = conv_name_base + '2b',
-                  kernel_initializer = glorot_uniform(seed = 0)) (X)
+                  kernel_initializer = glorot_uniform(seed = 123)) (X)
         X = BatchNormalization(axis = 3, 
                                name = bn_name_base + '2b') (X)
         X = Activation('relu') (X)
@@ -209,7 +209,7 @@ class ResNet50 (JBaseKerasModel):
                   strides = (1, 1),
                   padding = 'valid',
                   name = conv_name_base + '2c',
-                  kernel_initializer = glorot_uniform(seed = 0)) (X)
+                  kernel_initializer = glorot_uniform(seed = 123)) (X)
         X = BatchNormalization(axis = 3, 
                                name = bn_name_base + '2c') (X)
 
@@ -252,7 +252,7 @@ class ResNet50 (JBaseKerasModel):
                    strides = (s,s),
                    padding = 'valid',
                    name = conv_name_base + '2a', 
-                   kernel_initializer = glorot_uniform(seed=0))(X)
+                   kernel_initializer = glorot_uniform(seed=123))(X)
         X = BatchNormalization(axis = 3, 
                                name = bn_name_base + '2a')(X)
         X = Activation('relu')(X)
@@ -263,7 +263,7 @@ class ResNet50 (JBaseKerasModel):
                   strides = (1, 1),
                   padding = 'same',
                   name = conv_name_base + '2b',
-                  kernel_initializer = glorot_uniform(seed = 0)) (X)
+                  kernel_initializer = glorot_uniform(seed = 123)) (X)
         X = BatchNormalization(axis = 3, 
                                name = bn_name_base + '2b') (X)
         X = Activation('relu') (X)
@@ -274,7 +274,7 @@ class ResNet50 (JBaseKerasModel):
                    strides = (1, 1),
                    padding = 'valid',
                    name = conv_name_base + '2c',
-                   kernel_initializer = glorot_uniform(seed = 0)) (X)
+                   kernel_initializer = glorot_uniform(seed = 123)) (X)
         X = BatchNormalization(axis = 3, 
                                name = bn_name_base + '2c') (X)
 
@@ -284,7 +284,7 @@ class ResNet50 (JBaseKerasModel):
                            strides = (s, s),
                            padding = 'valid',
                            name = conv_name_base + '1',
-                           kernel_initializer = glorot_uniform(seed = 0)) (X_shortcut)
+                           kernel_initializer = glorot_uniform(seed = 123)) (X_shortcut)
         X_shortcut = BatchNormalization(axis = 3, 
                                         name = bn_name_base + '1') (X_shortcut)
 
