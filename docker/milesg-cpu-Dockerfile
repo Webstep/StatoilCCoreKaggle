@@ -34,21 +34,25 @@ RUN conda install -y \
     dask \
     distributed \
     tensorflow \
-    keras
-
-# Conda install on this version takes FOREVER to do first transfer to cuda
-RUN pip install http://download.pytorch.org/whl/cpu/torch-0.3.0.post4-cp35-cp35m-linux_x86_64.whl
-RUN apt install build-essential -y
-RUN pip install torchvision mlxtend xgboost scikit-image pytest opencv-python imgaug
-
-RUN apt install -y p7zip-full
+    theano
 
 # Install Rust & configure
-RUN apt update -y && apt install -y curl
+RUN apt update -y && apt install -y curl build-essential openmpi-bin p7zip-full
 RUN curl https://sh.rustup.rs -sSf -o rust.sh \
     && bash rust.sh -y
 ENV PATH $PATH:/root/.cargo/bin
 RUN /root/.cargo/bin/rustup default nightly-2018-01-01
+
+# PyTorch, and others  (keras via pip because conda is outdated and gives error with pandas dfs)
+RUN pip install http://download.pytorch.org/whl/cpu/torch-0.3.0.post4-cp35-cp35m-linux_x86_64.whl
+RUN pip install --upgrade torchvision mlxtend xgboost scikit-image pytest opencv-python imgaug keras
+
+# Configure theano
+ENV HOME /root
+RUN mkdir $HOME/.keras && echo '{"image_data_format": "channels_last","epsilon": 1e-07,"floatx": "float32","backend": "theano"}' > $HOME/.keras/keras.json
+ENV KERAS_BACKEND theano
+ENV THEANO_FLAGS 'device=cpu,floatX=float32,dnn.enabled=False'
+
 
 EXPOSE 8888
 CMD jupyter notebook --ip 0.0.0.0 --port 8888 --allow-root
