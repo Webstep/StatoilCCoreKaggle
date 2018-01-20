@@ -1,10 +1,12 @@
 
+import os
 import numpy as np
+import pandas as pd
 from sklearn.base import BaseEstimator
-from icc.models.spencer.alexnet.preprocessing import *
 from keras.utils import to_categorical
 from keras.models import model_from_json
-import os
+from keras.optimizers import Adam
+from icc.models.spencer.alexnet.preprocessing import *
 
 
 class JBaseKerasModel(BaseEstimator):
@@ -16,7 +18,7 @@ class JBaseKerasModel(BaseEstimator):
         self.weights_path = weights_path
 
 
-    def fit(self, X, y):
+    def fit(self, X: pd.DataFrame, y: pd.Series):
         x_train, x_valid, y_train, y_valid = self._preprocess(X, y)
         
         # Convert labels to categorical one-hot encoding
@@ -44,21 +46,21 @@ class JBaseKerasModel(BaseEstimator):
 
         return self
 
-    def predict(self, X, thresh = 0.5):
+    def predict(self, X: pd.DataFrame, thresh = 0.5):
         """
         Binary prediction for X.
         """
         probs = self.predict_proba(X)
         return np.array([1 if p[1] > thresh else 0 for p in probs])
 
-    def predict_proba(self, X):
+    def predict_proba(self, X: pd.DataFrame):
         """
         Prediction for X.
         """
         X = self.prep._basic_testset(X)
         return self.model.predict(X)
 
-    def get_model():
+    def get_model(self):
         """
         Returns the model.
         """

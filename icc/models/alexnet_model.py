@@ -91,32 +91,11 @@ class AlexNet(BaseEstimator):
         Returns: probabilities computed using softmax.
         """
         X_scaled = self.prep._basic_testset(X)
-        
-        try:
-            # Want to get predictions for a large dataset?
-            if X_scaled.shape[0] <= 4000:
-                # No -> my memory can handle up to 4000 samples.
-                probs = self.sess.run(self.y_probs, feed_dict={self.X_batch: X_scaled})
-            else:
-                # Yes -> divide data into partitions
-                if (X_scaled.shape[0] % self.partition) != 0:
-                    raise Exception
-                
-                n_samples = X_scaled.shape[0] // self.partition
-                probs = np.ndarray((X_scaled.shape[0], 2))
-                for i in range(self.partition):
-                    start_idx = i * n_samples
-                    end_idx = (i * n_samples) + n_samples
-                    probs[start_idx:end_idx,:] = (self.sess.run(self.y_probs, 
-                                                feed_dict={self.X_batch: X_scaled[start_idx: end_idx]}))
-            return probs
-
-        except MemoryError as e:
-            print(e)
-            print("Out of Memory error! Try increasing number of partitions to divide your dataset.")
-        except Exception as e:
-            print("{} samples is not divisible by {}. Chose a partition number that is divisible by {}"
-                .format(X_scaled.shape[0], self.partition, X_scaled.shape[0]))
+        probs = np.ndarray((X_scaled.shape[0], 2))
+        for i in range(0, X_scaled.shape[0] - self.batch_size, self.batch_size):
+            probs[i:i+self.batch_size, :] = (self.sess.run(self.y_probs,
+                                                           feed_dict={self.X_batch: X_scaled[i:i+self.batch_size]}))
+        return probs
 
 
     def _loss(self, logits, labels):
