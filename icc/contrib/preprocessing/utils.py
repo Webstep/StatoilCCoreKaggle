@@ -4,6 +4,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import json
 import numpy as np
 import os
 import pandas as pd
@@ -31,6 +32,25 @@ def load_from_pickle(filename):
 def save_to_pickle(data, filename):
     with open(filename, 'wb') as fp:
         pickle.dump(data, fp, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+def save_graph_layout(model, filepath):
+    """Keras only."""
+    json_str = model.to_json()
+    with open(filepath, 'w') as f:
+        json.dump(json_str, f)
+    print('=> Saved graph.')
+
+
+def load_graph_layout(filepath):
+    """Keras only."""
+    # Load graph
+    with open(filepath, 'r') as f:
+        json_str = json.load(f)
+    
+    # Convert json string to graph object
+    from keras.models import model_from_json
+    return model_from_json(json_str)
 
 
 class Preprocess(object):
@@ -69,7 +89,7 @@ class Preprocess(object):
 
 
     def _basic_testset(self, X: pd.DataFrame, how: str='deep'):
-        """Preprocess testset. BUG!
+        """Preprocess testset.
 
         Args:
             X: test set.
@@ -116,6 +136,13 @@ class Preprocess(object):
             return np.asarray(y.tolist())
         elif how == 'vertical':
             return np.asarray(y.tolist() * 3)
+
+
+    def filter_angle(self, X, y, thresh: float=0.0):
+        # Select only images that have an angle greater than zero.
+        X.inc_angle = X.inc_angle.replace(np.nan, 0)
+        idx = np.where(X.inc_angle > thresh)
+        return [ X.iloc[idx[0]], y[idx[0]] ] 
 
 
 class FeatureScaling(object):
